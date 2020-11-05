@@ -23,7 +23,7 @@ app.get('/', (req, res)=>{
 });
 
 // Todos los clientes
-app.get('/customers', (req, res)=>{
+app.get('/clientes', (req, res)=>{
     const sql= "SELECT * FROM customers";
     connection.query(sql, (error, results)=>{
         if(error) throw error;
@@ -37,23 +37,52 @@ app.get('/customers', (req, res)=>{
 
 
 // Obtener un cliente
-app.get('/customers/:id', (req, res)=>{
-    res.send("Obtener un cliente");
+app.get('/clientes/:id', (req, res)=>{
+    const {id} = req.params;
+    const sql = `SELECT * FROM customers WHERE id=${id}`;
+    connection.query(sql, (error, result)=>{
+        if(error) throw error;
+        if(result.length >0){
+            res.json(result);
+        }else{
+            res.send("No hay resultados");
+        }
+    });
+
 });
 
 // Registrar cliente
-app.post('/add', (req, res)=>{
-    res.send("Nuevo cliente");
+app.post('/agregar', (req, res)=>{
+    sql = "INSERT INTO customers SET ?";
+    const costumerObject ={
+        name: req.body.name,
+        city: req.body.city
+    }
+    connection.query(sql, costumerObject, error =>{
+        if(error) throw error;
+        res.send("Cliente creado");        
+    });
 });
 
 // Actualizar cliente
-app.put('/update/:id', (req, res)=>{
-    res.send("actualizar cliente");
+app.put('/actualizar/:id', (req, res)=>{
+    const {id} = req.params;
+    const {name, city} = req.body;
+    const sql = `UPDATE customers SET name='${name}', city='${city}' WHERE id=${id}`;
+    connection.query(sql, error =>{
+        if(error) throw error;
+        res.send("Cliente actualizado");        
+    });
 });
 
 // Eliminar cliente
-app.delete('/delete/:id', (req, res)=>{
-    res.send("Eliminar cliente");
+app.delete('/eliminar/:id', (req, res)=>{
+    const {id} = req.params;
+    const sql = `DELETE FROM customers WHERE id=${id}`;
+    connection.query(sql, error =>{
+        if(error) throw error;
+        res.send("Cliente eliminado");        
+    });
 });
 
 // Checando conexión
